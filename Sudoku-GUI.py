@@ -1,11 +1,12 @@
-#Matt Querdasi
-#Sudoku-GUI.py
+# Matt Querdasi
+# Sudoku-GUI.py
 
+# import libraries and intiate pygame font
 import pygame
 import time
 pygame.font.init()
 
-#colors
+# colors
 teal = (0,128,160)
 red = (255,50,50)
 green = (0,200,0)
@@ -13,7 +14,7 @@ white = (255,255,255)
 black = (0,0,0)
 yellow = (255,215,0)
 
-
+# grid class definition (game board)
 class Grid:
     sample_board = [[0,0,2,4,0,5,8,0,0],
                     [0,4,1,8,0,0,0,2,0],
@@ -26,6 +27,9 @@ class Grid:
                     [0,0,8,3,0,6,9,0,0]]
 
     def __init__(self, rows, cols, width, height, window, top_spacing):
+        """
+        initializing grid specs
+        """
         self.rows = rows
         self.cols = cols
         self.width = width
@@ -37,8 +41,13 @@ class Grid:
         self.solution = None
         self.score = 0
 
+
     def drawLines(self):
-        #Draws sudoku board lines
+        """
+        draws board lines
+        input: none
+        return: none
+        """
         top_spacing = self.top_spacing
         spacing = self.width/9
 
@@ -56,7 +65,11 @@ class Grid:
                 pygame.draw.line(self.window, white, (0, current + top_spacing), (self.width, current + top_spacing), 1)
 
     def drawCubes(self):
-        #Draws cube numbers on to board
+        """
+        draws cube numbers to board
+        input: none
+        return: none
+        """
         top_spacing = self.top_spacing
         spacing = self.width/9
 
@@ -66,12 +79,21 @@ class Grid:
                 curr_cube.draw(self.window) #draws cube number
 
     def clickReset(self):
-        #resets selected cube
+        """
+        resets selected cube
+        input: none
+        return: none
+        """
         (row, col) = self.selected
         self.cubes[row][col].selected = False
         self.selected = None
 
     def mouseClick(self, position):
+        """
+        selects clicked cube
+        position: (int, int) position
+        return: none
+        """
         #Takes input x,y from mouse click position
         (x,y) = position
 
@@ -89,8 +111,11 @@ class Grid:
                 self.selected = (row, col)
 
     def keyPress(self, input):
-        #Takes int input from user and changes cube value
-
+        """
+        Takes int input from user and changes cube value
+        input: key press
+        return: none
+        """
         if self.selected is not None and input is not None:
             (row, col) = self.selected
             if self.cubes[row][col].value == 0:
@@ -98,8 +123,11 @@ class Grid:
                 self.cubes[row][col].temp = input
 
     def solveBoard(self, board):
-        #board: board list of ints
-        #return: bool
+        """
+        Takes board list and returns True if solved False otherwise
+        board: board list of ints
+        return: bool
+        """
 
         found = self.findEmpty(board)
         if found:
@@ -122,10 +150,11 @@ class Grid:
         return False
 
     def findEmpty(self, board):
-        #finds first empty location on board
-        #board: board list of ints
-        #return: (row, col)
-
+        """
+        finds first empty location on board
+        board: board list of ints
+        return: (int, int) position
+        """
         for i in range(0, len(board)):
             for j in range(0, len(board[0])):
                 if board[i][j] == 0:
@@ -161,6 +190,11 @@ class Grid:
         return True
 
     def checkMoves(self):
+        """
+        checks users move for correct input and adjusts score
+        input: none
+        return: none
+        """
         #checks if board has been solved already and solves
         if self.solution is None:
             copy = self.sample_board
@@ -185,6 +219,11 @@ class Grid:
                     self.score += 1
 
     def updateBoard(self, time):
+        """
+        Updates time and score and draws time and score
+        input: int time
+        return: none
+        """
         #Draws time
         time_font = pygame.font.SysFont("Arial", 40) #sets font to arial
         min = str(time//60)
@@ -202,14 +241,20 @@ class Grid:
         self.window.blit(score_text_display, (25, 15))
 
     def deleteMove(self):
+        """
+        deletes user move and sets cube to 0 (null)
+        input: none
+        return: none
+        """
         #Resets temp value of selected cube
         if self.selected is not None:
             (row, col) = self.selected
             if self.cubes[row][col].value == 0:
                 self.cubes[row][col].temp = 0
 
-
+# Cube class definition
 class Cube:
+    # Cube init specs
     def __init__(self, value, row, col, width, height, top_spacing):
         self.value = value
         self.temp = 0
@@ -223,6 +268,11 @@ class Cube:
         self.top_spacing = top_spacing
 
     def draw(self, window):
+        """
+        draws cubes based on user input
+        window: pygame window display
+        return: none
+        """
         spacing = int(self.width/9)
         hor_adj = 18
         vert_adj = 12 + self.top_spacing
@@ -258,10 +308,17 @@ class Cube:
             window.blit(number, (x + hor_adj, y + vert_adj))
 
 
+# Global functions
 def drawBoard(window, board, time):
+    """
+    clears screen and draws cubes based on user input
+    window: pygame window display
+    board: Grid instance
+    time: int time
+    return: none
+    """
     #wipes screen
     window.fill(teal)
-
     #draws grid lines
     board.drawLines()
     #draws cubes
@@ -270,6 +327,13 @@ def drawBoard(window, board, time):
     board.updateBoard(time)
 
 def main():
+    """
+    entry point function that sets initial board, window, time specs
+    contains main game loop and and user input checks 
+
+    input: none
+    return: none
+    """
     window = pygame.display.set_mode((500,550))
     pygame.display.set_caption("Sudoku Game")
     sudoku_board = Grid(9, 9, 500, 500, window, 50)
